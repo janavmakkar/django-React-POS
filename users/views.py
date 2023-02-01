@@ -8,9 +8,6 @@ from .serializers import UserSerializer
 def register(request):
     data=request.data
     
-    # if User.objects.filter(email=data['email']).exists():
-    #     raise exceptions.APIException('User with this email already exists')
-    
     if data['password'] != data['confirm_password']:
         raise exceptions.APIException('Passwords do not match')
     
@@ -22,5 +19,5 @@ def register(request):
 
 @api_view(['GET'])
 def users(request):
-    users=User.objects.all()
-    return Response(users)
+    serializer=UserSerializer( User.objects.all(),many=True)
+    return Response(serializer.data)
