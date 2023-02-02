@@ -2,3 +2,5 @@ Django==3.2.16
 djangorestframework==3.12.2
 mysqlclient==2.0.1
 django-mysql==3.9
+# PyJWT==1.7.1 installed in tutorial
+PyJWT==2.6.0
