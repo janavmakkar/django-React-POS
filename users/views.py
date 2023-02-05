@@ -40,6 +40,17 @@ def login(request):
     }
     return response 
 
+# Logout
+@api_view(['POST'])
+def logout(_):
+    response=Response()
+    response.delete_cookie('jwt')
+    response.data={
+        'message': 'Success! jwt cookie deleted'
+    }
+    return response
+
+# Authenticate via jwt cookie
 class AuthenticatedUser(APIView):
     # Custom Middleware imported from authentication.py
     authentication_classes=[JWTAuthentication,IsAuthenticated]
@@ -52,11 +63,6 @@ class AuthenticatedUser(APIView):
         return Response({
             'data':serializer.data
         })
-
-
-
-
-
 
 # Users
 @api_view(['GET'])
