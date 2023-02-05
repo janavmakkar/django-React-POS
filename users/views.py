@@ -53,7 +53,7 @@ def logout(_):
 # Authenticate via jwt cookie
 class AuthenticatedUser(APIView):
     # Custom Middleware imported from authentication.py
-    authentication_classes=[JWTAuthentication,IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
     
     # Prebuilt Middleware to check if it is authenticated before moving forward
     permission_classes=[IsAuthenticated] 
