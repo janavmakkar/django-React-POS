@@ -1,11 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import exceptions
+from rest_framework import exceptions, viewsets
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated 
-from .models import User
-from .serializers import UserSerializer
 from .authentication import generate_access_token, JWTAuthentication
+from .models import User,Permission,Role
+from .serializers import UserSerializer,PermissionSerializer,RoleSerializer
 
 # Register
 @api_view(['POST'])
@@ -20,7 +20,6 @@ def register(request):
     serializer.save()
 
     return Response(serializer.data)
-
 # Login
 @api_view(['POST'])
 def login(request):
@@ -39,7 +38,6 @@ def login(request):
         'jwt':token
     }
     return response 
-
 # Logout
 @api_view(['POST'])
 def logout(_):
@@ -49,7 +47,11 @@ def logout(_):
         'message': 'Success! jwt cookie deleted'
     }
     return response
-
+# Users
+@api_view(['GET'])
+def users(request):
+    serializer=UserSerializer( User.objects.all(),many=True)
+    return Response(serializer.data)
 # Authenticate via jwt cookie
 class AuthenticatedUser(APIView):
     # Custom Middleware imported from authentication.py
@@ -63,9 +65,36 @@ class AuthenticatedUser(APIView):
         return Response({
             'data':serializer.data
         })
+# Show all permissions
+class PermissionAPIView(APIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated] 
+    def get(self, request):
+        serializer=PermissionSerializer(Permission.objects.all(),many=True)
+        return Response({
+            'data':serializer.data
+        })
+# Show all Roles
+class RoleViewset(viewsets.ViewSet):
+    # Viewsets does not have 'get' method, like APIView coz it is used 
+    # to get both single item and list of items
+    # To deal with that confusion Viewsets give many predfined functions
+    # like - list, retrieve, create, update, destroy
 
-# Users
-@api_view(['GET'])
-def users(request):
-    serializer=UserSerializer( User.objects.all(),many=True)
-    return Response(serializer.data)
+    def list(self,request):
+        serializer=RoleSerializer(Role.objects.all(),many=True)
+        return Response({
+            'data':serializer.data
+        })
+    
+    def create(self,request):
+        pass
+
+    def retrieve(self,request, pk=None):
+        pass
+    
+    def update(self,request, pk=None):
+        pass
+    
+    def destroy(self,request, pk=None):
+        pass

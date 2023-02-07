@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User,Permission,Role
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,14 +16,13 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    # def create(self, validated_data):
-    #     user = User.objects.create_user(**validated_data)
-    #     return user
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Permission
+        fields='__all__'
 
-    # def update(self, instance, validated_data):
-    #     password = validated_data.pop('password', None)
-    #     user = super(UserSerializer, self).update(instance, validated_data)
-
-    #     if password is not None:
-    #         user.set_password(password)
-    #         user.save()
+class RoleSerializer(serializers.ModelSerializer):
+    permissions=PermissionSerializer(many=True)
+    class Meta:
+        model=Role
+        fields='__all__'
