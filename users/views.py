@@ -20,6 +20,7 @@ def register(request):
     serializer.save()
 
     return Response(serializer.data)
+
 # Login
 @api_view(['POST'])
 def login(request):
@@ -38,6 +39,7 @@ def login(request):
         'jwt':token
     }
     return response 
+
 # Logout
 @api_view(['POST'])
 def logout(_):
@@ -47,11 +49,13 @@ def logout(_):
         'message': 'Success! jwt cookie deleted'
     }
     return response
+
 # Users
 @api_view(['GET'])
 def users(request):
     serializer=UserSerializer( User.objects.all(),many=True)
     return Response(serializer.data)
+
 # Authenticate via jwt cookie
 class AuthenticatedUser(APIView):
     # Custom Middleware imported from authentication.py
@@ -65,6 +69,7 @@ class AuthenticatedUser(APIView):
         return Response({
             'data':serializer.data
         })
+
 # Show all permissions
 class PermissionAPIView(APIView):
     authentication_classes=[JWTAuthentication]
@@ -74,6 +79,7 @@ class PermissionAPIView(APIView):
         return Response({
             'data':serializer.data
         })
+
 # Show all Roles
 class RoleViewset(viewsets.ViewSet):
     # Viewsets does not have 'get' method, like APIView coz it is used 
@@ -81,12 +87,14 @@ class RoleViewset(viewsets.ViewSet):
     # To deal with that confusion Viewsets give many predfined functions
     # like - list, retrieve, create, update, destroy
 
+    # GET
     def list(self,request):
         serializer=RoleSerializer(Role.objects.all(),many=True)
         return Response({
             'data':serializer.data
         })
     
+    # POST
     def create(self,request):
         serializer=RoleSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -95,11 +103,27 @@ class RoleViewset(viewsets.ViewSet):
             'data':serializer.data
         },status=status.HTTP_201_CREATED)
 
+    # GET
     def retrieve(self,request, pk=None):
-        pass
+        role=Role.objects.get(id=pk)
+        serializer=RoleSerializer(role)
+        return Response({
+            'data':serializer.data
+        })
     
+    # PUT
     def update(self,request, pk=None):
-        pass
+        role=Role.objects.get(id=pk)
+        serializer=RoleSerializer(instance=role,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            'data':serializer.data
+        },status=status.HTTP_202_ACCEPTED)
     
+    # DELETE
     def destroy(self,request, pk=None):
-        pass
+        role=Role.objects.get(id=pk)
+        role.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
