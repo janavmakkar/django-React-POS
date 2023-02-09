@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import users, register,login, AuthenticatedUser, logout, PermissionAPIView, RoleViewset
+from .views import register,login, AuthenticatedUser, logout, PermissionAPIView, RoleViewset, UserGenericAPIView
 
 urlpatterns = [
     # path('users/', users),
@@ -18,4 +18,8 @@ urlpatterns = [
         'put':'update',
         'delete':'destroy'
     })),
+
+    path('users/',UserGenericAPIView.as_view()),
+    path('users/<str:pk>',UserGenericAPIView.as_view())
+
 ]

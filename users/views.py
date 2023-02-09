@@ -1,11 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import exceptions, viewsets,status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated 
 from .authentication import generate_access_token, JWTAuthentication
+from rest_framework import exceptions, viewsets, status, generics, mixins
 from .models import User,Permission,Role
 from .serializers import UserSerializer,PermissionSerializer,RoleSerializer
+from admin.pagination import CustomPagination
 
 # Register
 @api_view(['POST'])
@@ -49,12 +50,6 @@ def logout(_):
         'message': 'Success! jwt cookie deleted'
     }
     return response
-
-# Users
-@api_view(['GET'])
-def users(request):
-    serializer=UserSerializer( User.objects.all(),many=True)
-    return Response(serializer.data)
 
 # Authenticate via jwt cookie
 class AuthenticatedUser(APIView):
@@ -126,4 +121,36 @@ class RoleViewset(viewsets.ViewSet):
         role=Role.objects.get(id=pk)
         role.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# API's for Users
+class UserGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, 
+                         mixins.RetrieveModelMixin, mixins.UpdateModelMixin, 
+                         mixins.CreateModelMixin, mixins.DestroyModelMixin):
+
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated] 
+    queryset=User.objects.all()
+    serializer_class=UserSerializer
+    pagination_class=CustomPagination
+    
+    def get(self,request,pk=None):
+        if pk:
+            return Response({
+                'data':self.retrieve(request,pk).data
+            })
+        return self.list(request)
+    
+    def post(self,request):
+        return Response({
+            'data':self.create(request).data
+        })
+
+    def put(self,request,pk=None):
+        return Response({
+            'data':self.update(request,pk).data
+        })
+    
+    def delete(self,request,pk=None):
+        return self.destroy(request,pk)
+        
 
