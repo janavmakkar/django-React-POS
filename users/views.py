@@ -141,13 +141,22 @@ class UserGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
         return self.list(request)
     
     def post(self,request):
+        request.data.update({
+            'password':"root",              # every new user created gets default password "root"
+            'role':request.data['role_id']  # use "role_id" from request data to fill "role" column
+        })
         return Response({
             'data':self.create(request).data
         })
 
-    def put(self,request,pk=None):
+    def put(self,request,pk=None):         
+        if (request.data['role_id']):         # if new "role" is provided to be updated then get it from "role_id"
+            request.data.update({
+                'role':request.data['role_id']
+            })
+
         return Response({
-            'data':self.update(request,pk).data
+            'data':self.partial_update(request,pk).data
         })
     
     def delete(self,request,pk=None):

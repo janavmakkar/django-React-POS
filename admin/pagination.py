@@ -2,7 +2,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 DEFAULT_PAGE=1
-DEFAULT_PAGESIZE=1
+DEFAULT_PAGESIZE=10
 
 class CustomPagination(PageNumberPagination):
     page=DEFAULT_PAGE
