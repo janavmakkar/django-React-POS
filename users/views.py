@@ -60,9 +60,10 @@ class AuthenticatedUser(APIView):
     permission_classes=[IsAuthenticated] 
 
     def get(self, request):
-        serializer=UserSerializer(request.user)
+        data=UserSerializer(request.user).data
+        data['permissions']=[p['name'] for p in data['role']['permissions']]
         return Response({
-            'data':serializer.data
+            'data':data
         })
 
 # Show all permissions
@@ -162,4 +163,5 @@ class UserGenericAPIView(generics.GenericAPIView, mixins.ListModelMixin,
     def delete(self,request,pk=None):
         return self.destroy(request,pk)
         
+    
 
